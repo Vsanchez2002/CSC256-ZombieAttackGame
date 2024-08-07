@@ -20,7 +20,7 @@ updateZombies:
 	mov	x20, x0        // x20 = pointer to zombie array
 
 	loop_start:
-	cbz	x19, loop_end 
+	cbz	x19
 
  	ldr	x0, [x20]      // x0 = *zombie_position
 	mov	x1, x1         // x1 = human_position
