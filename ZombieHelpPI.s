@@ -24,7 +24,7 @@ updateZombies:
 
  	ldr	x0, [x20]      // x0 = *zombie_position
 	mov	x1, x1         // x1 = human_position
-
+	
  	bl	moveZombie
 
    	// Store the updated zombie position
