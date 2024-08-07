@@ -15,51 +15,30 @@ updateZombies:
 	str	x19, [sp, 16]
 	.cfi_offset 19, -48
 
- 	// Initialize variables
-	mov	x19, #0          // i = 0
-	mov	w20, #-1         // winner = -1
-	mov	x21, x0         // x21 = zom (pointer to zombies)
-	mov	x22, x1         // x22 = hum (pointer to human)
-	ldr	w23, =ZOMBIECOUNT // x23 = ZOMBIECOUNT
+ 	// Initialize the loop counter
+	mov	x19, x2        // x19 = number of zombies
+	mov	x20, x0        // x20 = pointer to zombie array
 
-loop_start:
-	cmp	x19, x23        // Compare i with ZOMBIECOUNT
-	bge	loop_end        // If i >= ZOMBIECOUNT, exit loop
+	loop_start:
+	cbz	x19, loop_end 
 
-	// Update X-coordinate of Zombie i
-	ldr	x0, [x21, x19, LSL #4] // x0 = zom[i].X
-	ldr	x1, [x22]        // x1 = hum->X
-	bl	moveZombie
-	str	x0, [x21, x19, LSL #4] // zom[i].X = moveZombie(zom[i].X, hum->X)
+ 	ldr	x0, [x20]      // x0 = *zombie_position
+	mov	x1, x1         // x1 = human_position
 
-	// Update Y-coordinate of Zombie i
-	ldr	x0, [x21, x19, LSL #4 + 8] // x0 = zom[i].Y
-	ldr	x1, [x22 + 8]    // x1 = hum->Y
-	bl	moveZombie
-	str	x0, [x21, x19, LSL #4 + 8] // zom[i].Y = moveZombie(zom[i].Y, hum->Y)
+ 	bl	moveZombie
 
-	// Check if Zombie caught human
-	ldr	x0, [x21, x19, LSL #4] // x0 = zom[i].X
-	ldr	x1, [x22]        // x1 = hum->X
-	cmp	x0, x1           // Compare zom[i].X with hum->X
-	bne	check_y          // If not equal, check Y-coordinate
+   	// Store the updated zombie position
+	str	x0, [x20]
+ 	
 
-	ldr	x0, [x21, x19, LSL #4 + 8] // x0 = zom[i].Y
-	ldr	x1, [x22 + 8]    // x1 = hum->Y
-	cmp	x0, x1           // Compare zom[i].Y with hum->Y
-	bne	continue_loop   // If not equal, continue loop
+	// Move to the next zombie
+	add	x20, x20, #8   
+	sub	x19, x19, #1
 
-	// Zombie caught the human
-	mov	w20, w19         // winner = i
-	b	loop_end         // Exit loop
-
-check_y:
-continue_loop:
-	add	x19, x19, #1     // i++
 	b	loop_start
 
-loop_end:
-	mov	w0, w20         // return winner
+
+
 
 
 
