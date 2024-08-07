@@ -15,7 +15,7 @@ updateZombies:
 	str	x19, [sp, 16]
 	.cfi_offset 19, -48
 
- 	// Initialize variables
+ 	 // Initialize variables
     mov x19, #0                  // i = 0
     mov w20, #-1                 // winner = -1
     mov x21, x0                  // x21 = zom (pointer to zombies)
@@ -27,24 +27,27 @@ loop_start:
     bge loop_end                 // If i >= ZOMBIECOUNT, exit loop
 
     // Update X-coordinate of Zombie i
-    ldr x0, [x21, x19, LSL #4]   // x0 = zom[i].X
+    add x24, x21, x19, LSL #4    // Calculate address zom[i].X
+    ldr x0, [x24]                // x0 = zom[i].X
     ldr x1, [x22]                // x1 = hum->X
     bl moveZombie
-    str x0, [x21, x19, LSL #4]   // zom[i].X = moveZombie(zom[i].X, hum->X)
+    str x0, [x24]                // zom[i].X = moveZombie(zom[i].X, hum->X)
 
     // Update Y-coordinate of Zombie i
-    ldr x0, [x21, x19, LSL #4 + 8] // x0 = zom[i].Y
+    add x24, x21, x19, LSL #4    // Calculate base address zom[i]
+    ldr x0, [x24, #8]            // x0 = zom[i].Y
     ldr x1, [x22, #8]            // x1 = hum->Y
     bl moveZombie
-    str x0, [x21, x19, LSL #4 + 8] // zom[i].Y = moveZombie(zom[i].Y, hum->Y)
+    str x0, [x24, #8]            // zom[i].Y = moveZombie(zom[i].Y, hum->Y)
 
     // Check if Zombie caught human
-    ldr x0, [x21, x19, LSL #4]   // x0 = zom[i].X
+    add x24, x21, x19, LSL #4    // Calculate address zom[i].X
+    ldr x0, [x24]                // x0 = zom[i].X
     ldr x1, [x22]                // x1 = hum->X
     cmp x0, x1                   // Compare zom[i].X with hum->X
     bne check_y                  // If not equal, check Y-coordinate
 
-    ldr x0, [x21, x19, LSL #4 + 8] // x0 = zom[i].Y
+    ldr x0, [x24, #8]            // x0 = zom[i].Y
     ldr x1, [x22, #8]            // x1 = hum->Y
     cmp x0, x1                   // Compare zom[i].Y with hum->Y
     bne continue_loop            // If not equal, continue loop
@@ -59,9 +62,7 @@ continue_loop:
     b loop_start
 
 loop_end:
-    mov w0, w20                  
-
-
+    mov w0, w20              
 
 
 
